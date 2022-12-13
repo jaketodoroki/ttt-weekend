@@ -1,64 +1,102 @@
 /*---------------- Constants --------------------*/
 const winningCombos = [
-  [0,1,2]
-  [3,4,5]
-  [6,7,8]
-  [2,4,6]
-  [2,5,8]
-  [0,4,8]
-  [1,4,7]
-  [0,3,6]
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6]
 ]
 
 
 /*--------------- Variables (state) -------------------*/
 
 let board, turn, winner, tie
-board = [null, null, null, null, null, null, null, null, null]
 
 /*------------- Cached Element References -------------*/
 
 const squareEls = document.querySelectorAll('.sqr')
+//console.log("🚀 ~ file: app.js:22 ~ squareEls", squareEls)
 // console.log(squareEls)
 const messageEl = document.getElementById('message')
 // console.log(messageEl)
+const boardEl = document.querySelector('.board')
+const resetBtn = document.getElementById('reset-btn')
 
 /*--------------- Event Listeners ----------------*/
-
-
+boardEl.addEventListener('click', handleClick)
+resetBtn.addEventListener('click', init)
 
 /*----------------- Functions --------------------*/
 
+init()
+
+function handleClick(evt) {
+  let sqIdx = parseInt(evt.target.id.replace('sq', ''))
+  if (board[sqIdx] || winner) return
+  placePiece(sqIdx)
+  checkForTie()
+  checkForWinner()
+  switchPlayerTurn()
+  render()
+}
+
+function checkForWinner(){
+  winningCombos.forEach(combo => {
+    if (Math.abs(board[combo[0]]+ board[combo[1]]+ board[combo[2]]) === 3) {
+      winner = true
+    }
+  })
+}
+
+function switchPlayerTurn(){
+  if (winner) return
+  turn *= -1
+}
+
+function checkForTie(){
+  if (board.includes(null)) return
+  tie = true
+}
+
+function placePiece(sqIdx){
+  board[sqIdx] = turn
+}
+
 function init(){
+  board = [null, null, null, null, null, null, null, null, null]
   turn = 1
   winner = false
   tie = false
-  render()
 // console.log('init has run')
 }
 
 const render = function(){
-  init()
   updateMessage()
   updateBoard()
 }
 
 const updateBoard = function(){
-  if (turn = 1){
-    board.forEach((element, index) => {
-      squareEls[index].textContent = 'x'
-    });
-  }
+  board.forEach((boardVal, idx) => {
+      if (boardVal === 1){
+      squareEls[idx].textContent = 'x'
+      squareEls[idx].style.color = 'lime'
+    } else if (boardVal === -1){
+      squareEls[idx].textContent = 'o'
+      squareEls[idx].style.color = 'purple'
+    } else {
+      squareEls[idx].textContent = ''
+    }
+  })
 }
 
 const updateMessage = function(){
-  if (winner === false && tie === false){
-    `It's ${turn}'s turn`
-} if(winner === false && tie === true){
-    `it's a tie`
-} else {
-  `Good Job Bubba You Did It!!!!${turn}wins`
+  if (!winner && !tie){
+    messageEl.textContent = `It's ${turn === 1 ? 'x':'o'}'s turn`
   }
+}
 
 
 //// Step 1 - Define the required variables used to track the state of the game
@@ -128,10 +166,10 @@ const updateMessage = function(){
   //// 4f) Invoke both the `updateBoard` and the `updateMessage` functions
   ////     inside of your `render` function.
 
-// Step 5 - Define the required constants
+//// Step 5 - Define the required constants
 
-  // 5a) In a constant called `winningCombos` define the eight possible winning 
-  //     combinations as an array of arrays.
+  //// 5a) In a constant called `winningCombos` define the eight possible winning 
+  ////     combinations as an array of arrays.
 
 
 // Step 6 - Handle a player clicking a square with a `handleClick` function
@@ -225,4 +263,4 @@ const updateMessage = function(){
   //     a constant named `resetBtnEl`.
 
   // 7c) Attach an event listener to the `resetBtnEl`. On the `'click'` event 
-    //   it should call the `init` function you created ?in step 3 
+    //   it should call the `init` function you created ?in step 3
